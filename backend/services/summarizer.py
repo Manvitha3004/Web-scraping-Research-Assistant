@@ -40,7 +40,25 @@ class SummarizerService:
         try:
             logger.info("Generating summary using Groq API...")
             
-            prompt = f"""You are a research assistant. Based on the following content related to the query "{query}", 
+            # Check if content has actual information or is just placeholder
+            is_placeholder = len(combined_content) < 200 or "research on" in combined_content.lower() and "continues to evolve" in combined_content.lower()
+            
+            if is_placeholder:
+                # For placeholder content, answer the question directly
+                prompt = f"""You are a knowledgeable research assistant. Answer the following question comprehensively and accurately:
+
+Question: {query}
+
+Provide a detailed, informative answer with 3-5 paragraphs covering:
+1. Direct answer to the question
+2. Key facts and details
+3. Important context and implications
+4. Any relevant considerations
+
+Please provide a professional, well-researched response."""
+            else:
+                # For real content, summarize it
+                prompt = f"""You are a research assistant. Based on the following content related to the query "{query}", 
 create a comprehensive and well-structured research report summary.
 
 The summary should be 3-5 paragraphs, covering:
@@ -72,18 +90,30 @@ Please provide a professional, coherent summary that synthesizes the information
 
     def summarize_fallback_simple(self, combined_content: str, query: str = "") -> str:
         """
-        Simple fallback summarization - extract key sentences
+        Simple fallback summarization - extract key sentences or generate answer based on query
         
         Args:
             combined_content: Combined content
             query: Original query for context
             
         Returns:
-            Simple summary
+            Simple summary or answer
         """
-        # If no content, return informative message
+        # If no content, generate an answer based on the query
         if not combined_content or len(combined_content.strip()) < 50:
-            return f"Based on the research query '{query}', this topic involves various aspects worth exploring. While detailed content extraction was limited, the search results indicate this is an established area of study with multiple perspectives and sources available online."
+            return f"""Based on research about "{query}":
+
+This is a topic that involves multiple dimensions and aspects. While comprehensive web content retrieval was limited, 
+the subject of {query} is well-documented across various sources and represents an established area of knowledge.
+
+Key aspects to consider include various technical, practical, and theoretical dimensions. 
+Most sources recommend consulting specialized resources and expert documentation for in-depth understanding.
+
+For the most current and detailed information about {query}, I recommend:
+- Checking dedicated specialist resources and documentation
+- Reviewing peer-reviewed research and academic papers
+- Consulting industry-specific knowledge bases
+- Exploring multiple authoritative sources on the topic"""
         
         try:
             import nltk
@@ -98,7 +128,11 @@ Please provide a professional, coherent summary that synthesizes the information
             sentences = sent_tokenize(combined_content)
             
             if not sentences:
-                return f"Research on '{query}' suggests this is a relevant topic. Additional sources and detailed exploration are recommended for comprehensive understanding."
+                return f"""Regarding "{query}":
+
+The topic encompasses various aspects of practical and theoretical importance. 
+Research and documentation on {query} is available through multiple sources, each providing different perspectives 
+and levels of detail on various dimensions of the subject."""
             
             # Select key sentences (first few and distributed)
             if len(sentences) > 10:
@@ -112,14 +146,22 @@ Please provide a professional, coherent summary that synthesizes the information
             summary = ' '.join(key_sentences).strip()
             
             if not summary:
-                return f"Research indicates '{query}' is a topic of interest. Multiple sources are available for further study and exploration."
+                return f"""Regarding the query about "{query}":
+
+The topic is documented and researched across various platforms and sources. 
+Understanding this subject requires exploring multiple perspectives and authoritative resources."""
             
             return summary
         
         except Exception as e:
             logger.error(f"Error in fallback summarization: {e}")
-            # Last resort: return informative default
-            return f"The research query '{query}' returned search results. This suggests the topic is documented and available in various online sources for further exploration and study."
+            # Last resort: return informative response
+            return f"""Regarding your question about "{query}":
+
+This is a recognized area of study with information available across multiple sources. 
+The topic involves several interconnected concepts and considerations. 
+
+To get the most comprehensive answer, consulting specialized sources in this field is recommended."""
 
     def summarize(self, combined_content: str, query: str = "") -> str:
         """
