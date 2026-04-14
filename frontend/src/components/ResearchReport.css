@@ -1,0 +1,188 @@
+.research-report-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.report-header {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+  padding-bottom: var(--spacing-xl);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.report-title {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+  background: linear-gradient(135deg, var(--color-cyan), var(--color-amber));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: var(--font-family-mono);
+}
+
+.report-query {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-lg);
+  font-style: italic;
+}
+
+.copy-button {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--color-cyan), var(--color-cyan-dark));
+  color: var(--color-bg-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.copy-button:hover {
+  background: linear-gradient(135deg, var(--color-cyan-light), var(--color-cyan));
+  box-shadow: 0 0 15px rgba(0, 245, 212, 0.5);
+  transform: translateY(-2px);
+}
+
+.copy-button:active {
+  transform: translateY(0);
+}
+
+.report-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
+}
+
+.card {
+  padding: var(--spacing-xl);
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-normal);
+  animation: fadeIn 0.5s ease;
+}
+
+.card:hover {
+  border-color: var(--color-cyan);
+  box-shadow: 0 0 15px rgba(0, 245, 212, 0.15);
+}
+
+.section-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  font-family: var(--font-family-mono);
+}
+
+.section-title::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 24px;
+  background: linear-gradient(180deg, var(--color-cyan), var(--color-amber));
+  border-radius: var(--radius-sm);
+}
+
+.summary-section {
+  grid-column: 1 / -1;
+}
+
+.summary-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  line-height: 1.8;
+}
+
+.summary-text p {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+}
+
+.sources-section {
+  width: 100%;
+}
+
+.sources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.stats-section {
+  grid-column: 1 / -1;
+  margin-top: var(--spacing-xl);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(0, 245, 212, 0.1), rgba(255, 190, 11, 0.1));
+  border: 1px solid var(--color-border-accent);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-cyan);
+  font-family: var(--font-family-mono);
+}
+
+@media (max-width: 768px) {
+  .research-report-container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .report-title {
+    font-size: var(--font-size-2xl);
+  }
+
+  .report-query {
+    font-size: var(--font-size-base);
+  }
+
+  .card {
+    padding: var(--spacing-lg);
+  }
+
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .sources-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

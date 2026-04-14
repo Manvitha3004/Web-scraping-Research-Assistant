@@ -1,0 +1,48 @@
+.key-points-container {
+  width: 100%;
+}
+
+.key-points-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.point-item {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+  padding: var(--spacing-md);
+  border-left: 3px solid var(--color-cyan);
+  background-color: rgba(0, 245, 212, 0.02);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+}
+
+.point-item:hover {
+  background-color: rgba(0, 245, 212, 0.05);
+  border-left-color: var(--color-amber);
+  transform: translateX(5px);
+}
+
+.point-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-cyan), var(--color-cyan-dark));
+  color: var(--color-bg-primary);
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family-mono);
+}
+
+.point-text {
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  font-size: var(--font-size-base);
+}
