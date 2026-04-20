@@ -1,4 +1,4 @@
-# Autonomous Research Assistant 🔍
+# Autonomous Research Assistant 
 
 **AI-powered web research, scraping, and summarization tool** — Search, scrape, analyze, and summarize web content automatically using completely free APIs.
 
@@ -26,19 +26,19 @@
 
 ## Features
 
-✨ **Key Features:**
+**Key Features:**
 
-- 🔍 **Web Search** — DuckDuckGo integration (no API key needed!)
-- 📄 **Web Scraping** — Extract content intelligently with BeautifulSoup
-- 🤖 **AI Summarization** — Groq API for advanced NLP summaries
-- 📊 **Content Analysis** — Extract key points, themes, and statistics
-- 💾 **Smart Caching** — 24-hour cache with automatic expiration
-- 📱 **Responsive Design** — Terminal-aesthetic dark UI
-- ⚡ **Rate Limiting** — Respectful request delays to avoid blocks
-- 📋 **Markdown Export** — Copy full reports as formatted markdown
-- 🔐 **Search History** — LocalStorage-based recent searches
-- 🎨 **Modern UI** — Smooth animations with Vite + React
-- 📈 **Progress Tracking** — 4-step visual progress indicator
+- **Web Search** — DuckDuckGo integration (no API key needed!)
+- **Web Scraping** — Extract content intelligently with BeautifulSoup
+- **AI Summarization** — Groq API for advanced NLP summaries
+- **Content Analysis** — Extract key points, themes, and statistics
+- **Smart Caching** — 24-hour cache with automatic expiration
+- **Responsive Design** — Terminal-aesthetic dark UI
+- **Rate Limiting** — Respectful request delays to avoid blocks
+- **Markdown Export** — Copy full reports as formatted markdown
+- **Search History** — LocalStorage-based recent searches
+- **Modern UI** — Smooth animations with Vite + React
+- **Progress Tracking** — 4-step visual progress indicator
 
 ## Architecture
 
@@ -423,7 +423,7 @@ Health check endpoint.
 
 ## Limitations
 
-⚠️ **Known Limitations:**
+**Known Limitations:**
 
 1. **Rate Limiting**
    - DuckDuckGo: May block if requests are too rapid
@@ -453,7 +453,7 @@ Health check endpoint.
 
 ## Known Issues
 
-🐛 **Current Issues:**
+**Current Issues:**
 
 1. **PDF Content** — PDFs are currently skipped entirely. Future versions could use `PyPDF2` or `pdfplumber`.
 
@@ -465,7 +465,7 @@ Health check endpoint.
 
 ## Future Improvements
 
-🚀 **Planned Enhancements:**
+**Planned Enhancements:**
 
 - [ ] **PDF Extraction** — Using `PyPDF2` or `pdfplumber`
 - [ ] **JavaScript Rendering** — Selenium/Playwright integration for dynamic sites
