@@ -2,6 +2,7 @@ import logging
 import os
 from typing import Optional
 from groq import Groq
+from utils.cleaner import TextCleaner
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,8 @@ class SummarizerService:
         self.api_key = api_key or os.getenv('GROQ_API_KEY')
         if not self.api_key:
             logger.warning("GROQ_API_KEY not set. Summarization will use fallback methods")
+        else:
+            logger.info(f"Groq API key loaded: {self.api_key[:10]}...")
         
         self.client = Groq(api_key=self.api_key) if self.api_key else None
 
@@ -40,8 +43,15 @@ class SummarizerService:
         try:
             logger.info("Generating summary using Groq API...")
             
+            # Clean content before sending to Groq - remove Wikipedia markup and excess whitespace
+            cleaned_content = TextCleaner.clean_wikipedia_markup(combined_content)
+            cleaned_content = TextCleaner.clean_html_text(cleaned_content)
+            cleaned_content = TextCleaner.truncate_text(cleaned_content, max_length=4000)
+            
+            logger.debug(f"Cleaned content length: {len(cleaned_content)} chars (from {len(combined_content)})")
+            
             # Check if content has actual information or is just placeholder
-            is_placeholder = len(combined_content) < 200 or "research on" in combined_content.lower() and "continues to evolve" in combined_content.lower()
+            is_placeholder = len(cleaned_content) < 200 or ("research on" in cleaned_content.lower() and "continues to evolve" in cleaned_content.lower())
             
             if is_placeholder:
                 # For placeholder content, answer the question directly
@@ -49,7 +59,7 @@ class SummarizerService:
 
 Question: {query}
 
-Provide a detailed, informative answer with 3-5 paragraphs covering:
+Provide a detailed, informative answer with 3-5 clear paragraphs covering:
 1. Direct answer to the question
 2. Key facts and details
 3. Important context and implications
@@ -57,20 +67,25 @@ Provide a detailed, informative answer with 3-5 paragraphs covering:
 
 Please provide a professional, well-researched response."""
             else:
-                # For real content, summarize it
-                prompt = f"""You are a research assistant. Based on the following content related to the query "{query}", 
-create a comprehensive and well-structured research report summary.
+                # For real content, generate answer based on content + query
+                prompt = f"""You are a research assistant. Based ONLY on the following source content, answer this specific question in 3-5 clear paragraphs:
 
-The summary should be 3-5 paragraphs, covering:
-1. Main findings and key information
-2. Important details and context
-3. Implications and significance
+Question: {query}
 
-Content to summarize:
-{combined_content}
+Content to base your answer on:
+{cleaned_content}
 
-Please provide a professional, coherent summary that synthesizes the information."""
+Instructions:
+1. Directly address the question
+2. Use only information from the provided content
+3. Explain key concepts clearly
+4. Provide relevant context and implications
+5. Write in a professional, coherent manner
 
+Answer:"""
+
+            logger.debug(f"Prompt being sent to Groq (first 300 chars): {prompt[:300]}...")
+            
             message = self.client.chat.completions.create(
                 model="llama3-8b-8192",
                 messages=[
@@ -81,11 +96,15 @@ Please provide a professional, coherent summary that synthesizes the information
             )
             
             summary = message.choices[0].message.content
-            logger.info("Summary generated successfully")
+            logger.info(f"Summary generated successfully by Groq (length: {len(summary)} chars)")
+            logger.debug(f"Groq response (first 300 chars): {summary[:300]}...")
             return summary
         
         except Exception as e:
-            logger.error(f"Error with Groq summarization: {e}")
+            logger.error(f"Error with Groq summarization: {type(e).__name__}: {str(e)}")
+            logger.error(f"API Key configured: {bool(self.api_key)}")
+            if self.api_key:
+                logger.error(f"API Key prefix: {self.api_key[:10]}...")
             return None
 
     def summarize_fallback_simple(self, combined_content: str, query: str = "") -> str:

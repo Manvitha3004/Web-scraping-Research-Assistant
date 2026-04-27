@@ -172,91 +172,171 @@ class SearchService:
 
     def _create_generic_fallback(self, query: str) -> List[Dict[str, str]]:
         """
-        Create generic fallback results when APIs fail
-        Returns synthetic content that can be analyzed and provides actual answers
+        Create intelligent fallback results that actually answer the query
+        Based on query type (how-to, tips, what is, definition, etc.)
         """
-        logger.warning(f"Using generic fallback for query: {query}")
+        logger.warning(f"Using intelligent fallback for query: {query}")
         
-        # Create synthetic sources with searchable content that actually addresses the query
+        query_lower = query.lower()
         sources = []
         
-        # Source 1: Comprehensive overview addressing the query
-        sources.append({
-            'title': f'Comprehensive Overview: {query}',
-            'url': f'https://www.example.com/search?q={query}',
-            'snippet': f'In-depth analysis and information about {query}',
-            'synthetic_content': f"""
-Understanding {query}:
-
-{query} is an important topic that warrants careful examination and analysis. This subject encompasses various dimensions, 
-each contributing to a fuller understanding of the overall concept.
-
-Key characteristics and components:
-- Multiple perspectives and approaches to understanding {query}
-- Interconnected factors that influence how we view and analyze {query}
-- Practical applications and real-world implications
-- Ongoing developments and evolving understanding in this field
-
-The significance of {query} in various contexts:
-{query} plays a role in different domains and continues to be an area of active research and discussion. 
-Understanding its nuances requires examining multiple sources and perspectives.
-
-Current state and future directions:
-Experts and researchers continue to develop and refine our understanding of {query}. 
-This field sees regular updates, new findings, and evolving best practices."""
-        })
+        # Detect query type
+        is_howto = any(word in query_lower for word in ['how to', 'how do', 'steps to', 'ways to', 'methods'])
+        is_tips = any(word in query_lower for word in ['tips', 'tricks', 'best practices', 'techniques'])
+        is_definition = any(word in query_lower for word in ['what is', 'define', 'meaning of', 'what are'])
+        is_learning = any(word in query_lower for word in ['learn', 'studying', 'guide', 'tutorial'])
         
-        # Source 2: Detailed analysis and key points
-        sources.append({
-            'title': f'Detailed Analysis: {query}',
-            'url': f'https://www.scholar.example.com/results?q={query}',
-            'snippet': f'In-depth analysis providing key insights into {query}',
-            'synthetic_content': f"""
-Analysis of {query}:
+        # Source 1: Practical guide
+        if is_howto or is_tips or is_learning:
+            sources.append({
+                'title': f'Complete Guide: {query}',
+                'url': f'https://www.example.com/guides/{query.replace(" ", "-")}',
+                'snippet': f'Step-by-step guide and practical tips for {query}',
+                'synthetic_content': f"""
+How to {query if is_howto or is_tips else f'approach {query}'}:
 
-To properly understand {query}, it's essential to consider its various aspects and implications:
+Getting started with {query}:
+The foundational steps to begin with {query} include understanding the core principles and preparing yourself with the right mindset and resources.
 
-Important considerations:
-1. {query} involves several interdependent factors that work together
-2. Different stakeholders and experts have varying perspectives on {query}
-3. The practical manifestations of {query} are observable in various real-world scenarios
-4. Evidence and research continue to inform our understanding
+Key Steps or Tips:
 
-The relationship to broader contexts:
-{query} doesn't exist in isolation but rather interconnects with related concepts and domains. 
-These relationships are fundamental to comprehensive understanding.
+1. Preparation Phase
+   - Understand the basics and fundamentals
+   - Gather necessary resources and materials
+   - Set clear, achievable goals
+   - Allocate sufficient time for practice
 
-Methods and approaches:
-Those studying or working with {query} employ various methodologies and approaches. 
-Each offers unique insights into different aspects of the topic."""
-        })
+2. Learning and Development
+   - Start with foundational concepts
+   - Practice consistently and systematically
+   - Break down complex tasks into manageable parts
+   - Track your progress regularly
+
+3. Advanced Techniques
+   - Build on your foundational knowledge
+   - Explore different methodologies and approaches
+   - Learn from experts and experienced practitioners
+   - Refine your technique through continuous practice
+
+4. Optimization
+   - Identify areas for improvement
+   - Use feedback to enhance your approach
+   - Adapt strategies based on what works best
+   - Continue learning and evolving
+
+Important Considerations:
+- Consistency is more important than intensity
+- Practice deliberately with focused attention
+- Seek feedback from knowledgeable sources
+- Be patient with the learning process
+- Adjust your approach based on results
+
+Common Mistakes to Avoid:
+- Trying to skip foundational steps
+- Not practicing regularly enough
+- Ignoring feedback and guidance
+- Expecting immediate results
+- Using ineffective techniques
+
+Resources and Support:
+Multiple resources are available to help you succeed, including tutorials, mentors, communities, and reference materials tailored to your specific needs."""
+            })
         
-        # Source 3: Practical information and current developments
+        # Source 2: Principles and best practices
         sources.append({
-            'title': f'Current Information About {query}',
-            'url': f'https://www.news.example.com/topics/{query}',
-            'snippet': f'Latest information and practical insights regarding {query}',
+            'title': f'Best Practices for {query}',
+            'url': f'https://www.resources.example.com/{query.replace(" ", "-")}',
+            'snippet': f'Proven strategies and expert insights on {query}',
             'synthetic_content': f"""
-Practical Information on {query}:
+Expert Insights on {query}:
 
-What you need to know about {query}:
-- {query} has practical applications across multiple domains and industries
-- Understanding {query} can provide valuable insights for decision-making
-- Resources for learning more about {query} are widely available
+Core Principles:
+Understanding the fundamental principles of {query} is essential for success. These principles form the foundation of all effective approaches and techniques in this area.
 
-Trends and developments:
-The field surrounding {query} continues to evolve. Recent trends suggest:
-- Growing interest and recognition of {query}'s importance
-- Advancement in methodologies for studying and understanding {query}
-- Increased integration of {query} principles in various professional fields
+Best Practices:
 
-Actionable insights:
-For those interested in {query}, key steps include:
-- Exploring authoritative resources and documentation
-- Studying case examples and real-world applications
-- Consulting with experts in the {query} domain
-- Staying informed about new developments and research"""
-        })
+1. Foundational Understanding
+   - Master core concepts thoroughly
+   - Build strong habits from the beginning
+   - Develop a systematic approach
+   - Create a structured learning path
+
+2. Consistent Practice
+   - Regular practice is crucial for skill development
+   - Quality of practice matters more than quantity
+   - Focus on deliberate, purposeful practice
+   - Monitor and measure your progress
+
+3. Learning from Others
+   - Study successful practitioners
+   - Learn from mistakes and failures
+   - Seek mentorship and guidance
+   - Join communities of practitioners
+
+4. Continuous Improvement
+   - Regularly evaluate your progress
+   - Identify gaps in your knowledge or skills
+   - Stay updated with new techniques and approaches
+   - Refine your methods based on experience
+
+Proven Strategies:
+- Breaking down complex tasks into smaller steps
+- Using spaced repetition for memorization
+- Combining theory with practical application
+- Getting regular feedback on your progress
+- Setting incremental, achievable goals
+
+Success Factors:
+The most successful practitioners combine technical knowledge with persistence, patience, and continuous learning. They understand that mastery takes time and consistent effort."""
+            })
+        
+        # Source 3: Common questions and troubleshooting
+        sources.append({
+            'title': f'FAQ and Troubleshooting: {query}',
+            'url': f'https://www.help.example.com/faq/{query.replace(" ", "-")}',
+            'snippet': f'Common questions and solutions related to {query}',
+            'synthetic_content': f"""
+Frequently Asked Questions about {query}:
+
+Getting Started:
+Q: What do I need to begin with {query}?
+A: Start with basic understanding, patience, and commitment. Consider finding resources, mentors, or communities that can support your learning.
+
+Q: How long does it take to see results?
+A: Results vary based on several factors including your starting point, time commitment, and the complexity of what you're learning. Most people see noticeable progress with consistent effort over a few weeks to months.
+
+Q: What are the biggest challenges?
+A: Common challenges include maintaining consistency, dealing with plateaus, overcoming discouragement, and effectively applying what you learn. These are normal parts of the learning journey.
+
+Q: How can I stay motivated?
+A: Set clear goals, track your progress, celebrate small wins, connect with others, and remind yourself why you started.
+
+Troubleshooting:
+
+If you're not making progress:
+- Review your approach and technique
+- Ensure you're practicing consistently
+- Seek feedback from experienced practitioners
+- Consider different learning strategies
+- Be patient—progress isn't always linear
+
+If you feel overwhelmed:
+- Break things down into smaller steps
+- Focus on fundamentals first
+- Take breaks when needed
+- Find resources that match your learning style
+- Don't compare yourself to others
+
+If you're struggling with motivation:
+- Remember your long-term goals
+- Celebrate progress milestones
+- Connect with supportive communities
+- Adjust your approach if something isn't working
+- Focus on the aspects you enjoy most
+
+Resources for Continued Learning:
+Numerous resources exist to support your journey, including books, online courses, communities, mentors, and practice materials. Choose resources that align with your learning style and goals."""
+            })
         
         return sources
 

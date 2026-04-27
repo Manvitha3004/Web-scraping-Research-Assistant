@@ -55,3 +55,32 @@ class TextCleaner:
     def normalize_whitespace(text: str) -> str:
         """Normalize all whitespace to single spaces"""
         return re.sub(r'\s+', ' ', text).strip()
+
+    @staticmethod
+    def clean_wikipedia_markup(text: str) -> str:
+        """
+        Remove Wikipedia-specific markup and formatting
+        Handles: ==headings==, [[links]], {{templates}}, etc.
+        """
+        # Remove Wikipedia section headers (== Header ==)
+        text = re.sub(r'={2,}\s*.*?\s*={2,}', '', text)
+        
+        # Remove Wikipedia links [[link]]
+        text = re.sub(r'\[\[([^\]|]*)\]\]', r'\1', text)
+        
+        # Remove templates {{...}}
+        text = re.sub(r'\{\{[^}]*\}\}', '', text)
+        
+        # Remove citation markup [citation needed], <ref>, etc.
+        text = re.sub(r'\[citation needed\]', '', text, flags=re.IGNORECASE)
+        text = re.sub(r'<ref[^>]*>.*?</ref>', '', text, flags=re.DOTALL | re.IGNORECASE)
+        text = re.sub(r'</?[a-z]+[^>]*>', '', text, flags=re.IGNORECASE)
+        
+        # Remove bold/italic markup
+        text = re.sub(r"'''(.*?)'''", r'\1', text)  # Bold
+        text = re.sub(r"''(.*?)''", r'\1', text)   # Italic
+        
+        # Normalize whitespace after cleanup
+        text = re.sub(r'\s+', ' ', text).strip()
+        
+        return text

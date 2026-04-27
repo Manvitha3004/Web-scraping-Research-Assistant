@@ -3,6 +3,7 @@ import { SearchBar } from './components/SearchBar';
 import { ResearchReport } from './components/ResearchReport';
 import { ProgressLoader } from './components/ProgressLoader';
 import { ErrorDisplay } from './components/ErrorDisplay';
+import { Canvas3D } from './components/Canvas3D';
 import { useResearch } from './hooks/useResearch';
 import './styles/globals.css';
 import './App.css';
@@ -47,24 +48,32 @@ function App() {
 
   return (
     <div className="app">
-      {/* Hero Section */}
+      {/* Full-Screen Hero Section with 3D Canvas */}
+      <div className="hero-background">
+        <Canvas3D />
+        <div className="hero-overlay"></div>
+      </div>
+
+      {/* Header with Search */}
       <header className="hero-section">
         <div className="container">
-          <div className="logo-section">
-            <h1 className="main-title">
-              <span className="title-icon">🔍</span>
-              Research Assistant
-            </h1>
-            <p className="subtitle">
-              AI-powered web research, scraping, and summarization
-            </p>
-          </div>
+          <div className="header-content">
+            <div className="logo-section">
+              <h1 className="main-title">
+                <span className="title-icon">🔍</span>
+                Research Assistant
+              </h1>
+              <p className="subtitle">
+                Intelligent research with AI-powered scraping & analysis
+              </p>
+            </div>
 
-          <SearchBar 
-            onSearch={handleSearch} 
-            loading={loading}
-            placeholder="Enter your research topic..."
-          />
+            <SearchBar 
+              onSearch={handleSearch} 
+              loading={loading}
+              placeholder="Ask anything..."
+            />
+          </div>
 
           {/* Search History */}
           {searchHistory.length > 0 && !data && (

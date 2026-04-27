@@ -8,6 +8,7 @@ from services.search import SearchService
 from services.scraper import ScraperService
 from services.summarizer import SummarizerService
 from services.analyzer import AnalyzerService
+from services.relevance_filter import RelevanceFilter
 from utils.cache import SimpleCache
 
 logger = logging.getLogger(__name__)
@@ -19,6 +20,7 @@ search_service = SearchService()
 scraper_service = ScraperService()
 summarizer_service = SummarizerService()
 analyzer_service = AnalyzerService()
+relevance_filter = RelevanceFilter()
 cache = SimpleCache(cache_dir="./cache", ttl_hours=24)
 
 
@@ -37,16 +39,17 @@ async def research(request: ResearchRequest) -> ResearchResponse:
     start_time = time.time()
     
     try:
-        # 1. Check cache
+        # Step 1. Check cache
+        logger.info(f"Step 1: Checking cache for '{request.query}'")
         cached_result = cache.get(request.query)
         if cached_result:
-            logger.info(f"Returning cached result for: {request.query}")
+            logger.info(f"Cache hit - Returning cached result for: {request.query}")
             # Update processing time, but don't duplicate 'cached' field
             cached_result['processing_time'] = time.time() - start_time
             return ResearchResponse(**cached_result)
         
-        # 2. Search for sources (Step 1: Searching)
-        logger.info(f"Step 1: Searching for '{request.query}'")
+        # Step 2. Search for sources
+        logger.info(f"Step 2: Searching for '{request.query}'")
         search_results = search_service.search_with_retry(request.query, max_results=request.num_sources)
         
         if not search_results:
@@ -72,8 +75,8 @@ async def research(request: ResearchRequest) -> ResearchResponse:
             ))
             urls_to_scrape.append(result.get('url', ''))
         
-        # 3. Scrape content (Step 2: Scraping)
-        logger.info(f"Step 2: Scraping {len(urls_to_scrape)} sources")
+        # Step 3. Scrape content
+        logger.info(f"Step 3: Scraping {len(urls_to_scrape)} sources")
         scraped_contents = scraper_service.scrape_multiple_urls(urls_to_scrape)
         
         # Update sources with scraped content
@@ -100,13 +103,42 @@ async def research(request: ResearchRequest) -> ResearchResponse:
             # Provide a default message instead of erroring out
             combined_content = "No content could be extracted from the sources. This may indicate the sources require JavaScript rendering or have access restrictions. Please try a different search query."
         
-        # 4. Analyze and Summarize (Steps 3 & 4)
-        logger.info(f"Step 3: Analyzing content")
-        key_points = analyzer_service.extract_key_points(combined_content, num_points=7)
+        # Step 4. Filter sources and content for relevance
+        logger.info(f"Step 4: Filtering sources and content for relevance")
+        
+        # Filter sources based on query relevance (convert to dicts for filtering)
+        sources_list = [s.model_dump() for s in sources]
+        filtered_sources = relevance_filter.filter_sources(sources_list, request.query, min_relevance=0.15)
+        
+        # If all sources filtered out, keep original sources but log warning
+        if not filtered_sources:
+            logger.warning("All sources filtered - keeping original sources")
+            filtered_sources = sources_list
+        
+        # Convert back to SourceResponse objects
+        sources = [SourceResponse(**s) for s in filtered_sources]
+        
+        # Filter combined content for relevance
+        filtered_content = relevance_filter.filter_content(combined_content, request.query, max_chars=8000)
+        if filtered_content and len(filtered_content) > 100:
+            combined_content = filtered_content
+        
+        # Extract themes from raw content (before AI processing)
+        logger.info(f"Step 5: Extracting themes from content")
         themes = analyzer_service.extract_themes(combined_content, num_themes=5)
         
-        logger.info(f"Step 4: Generating summary")
+        # Filter themes for relevance
+        themes = relevance_filter.filter_themes(themes, request.query, min_relevance=0.1)
+        
+        logger.info(f"Step 6: Generating summary")
         summary = summarizer_service.summarize(combined_content, request.query)
+        
+        # Step 7. Extract key points from AI-generated summary (not raw text)
+        logger.info(f"Step 7: Extracting key points from AI summary")
+        key_points = analyzer_service.extract_key_points(summary, num_points=7)
+        
+        # Filter key points for relevance
+        key_points = relevance_filter.filter_key_points(key_points, request.query, min_relevance=0.15)
         
         # Create response
         response_data = {
@@ -120,7 +152,8 @@ async def research(request: ResearchRequest) -> ResearchResponse:
             "error": None
         }
         
-        # 5. Cache the result
+        # Step 8. Cache the result
+        logger.info(f"Step 8: Caching result")
         try:
             cache_data = {
                 "query": request.query,
